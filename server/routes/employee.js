@@ -6,7 +6,7 @@ const upload = require("../middleware/multer");
 
 router.get("/", EmployeeController.index);
 router.post("/show", EmployeeController.show);
-router.post("/store", upload.single("avatar"), EmployeeController.store);
+router.post("/store", upload.array("avatar"), EmployeeController.store);
 router.post("/update", EmployeeController.update);
 router.post("/destory", EmployeeController.destory);
 

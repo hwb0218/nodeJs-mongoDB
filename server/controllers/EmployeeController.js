@@ -8,7 +8,7 @@ module.exports = {
 
       return res.json({ employees });
     } catch (error) {
-      res.json({ message: this.errorMessage });
+      res.json({ message: this.errorMessage, error });
     }
   },
   show: async function (req, res, next) {
@@ -18,7 +18,7 @@ module.exports = {
 
       return res.json({ foundEmployee });
     } catch (error) {
-      res.json({ message: this.errorMessage });
+      res.json({ message: this.errorMessage, error });
     }
   },
   store: async function (req, res, next) {
@@ -31,11 +31,26 @@ module.exports = {
         phone,
         age,
       });
+
+      if (req.files) {
+        let path = "";
+        req.files.forEach((file) => {
+          path += file.path + ",";
+        });
+        console.log(path);
+        console.log(
+          "path.lastIndexOf(",
+          ")",
+          path.substring(0, path.lastIndexOf(","))
+        );
+        path = path.substring(0, path.lastIndexOf(","));
+        employee.avatar = path;
+      }
       await employee.save();
 
-      return res.json({ message: "Employee added successfully!" });
+      return res.json({ message: "Employee added successfully!", employee });
     } catch (error) {
-      res.json({ message: this.errorMessage });
+      res.json({ message: this.errorMessage, error });
     }
   },
   update: async function (req, res, next) {
@@ -52,7 +67,7 @@ module.exports = {
 
       return res.json({ message: "Employee updated successfully!", employee });
     } catch (error) {
-      res.json({ message: this.errorMessage });
+      res.json({ message: this.errorMessage, error });
     }
   },
   destory: async function (req, res, next) {
@@ -62,7 +77,7 @@ module.exports = {
 
       return res.json({ message: "Employee deleted successfully!" });
     } catch (error) {
-      res.json({ message: this.errorMessage });
+      res.json({ message: this.errorMessage, error });
     }
   },
 };
