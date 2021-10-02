@@ -1,5 +1,6 @@
 const path = require("path");
 const multer = require("multer");
+const { createBrotliCompress } = require("zlib");
 
 const storage = multer.diskStorage({
   destination(req, file, callback) {
@@ -13,14 +14,10 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, callback) => {
-  const extname = path.extname(file.originalname);
-  const isCorrectExt = ".jpg" || ".png";
+  const extname = path.extname(file.originalname).toLowerCase();
 
-  if (extname !== isCorrectExt) {
-    return callback(
-      res.status(400).end("only jpg & png file supproted!"),
-      false
-    );
+  if (extname !== ".jpg" && extname !== ".png") {
+    callback(new Error("only jpg & png file supproted!"), false);
   }
   callback(null, true);
 };
