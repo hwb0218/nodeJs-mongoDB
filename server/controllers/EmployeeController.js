@@ -2,7 +2,7 @@ const Employee = require("../models/Employee");
 
 module.exports = {
   errorMessage: "An error occured!",
-  index: async function (req, res, next) {
+  index: async function (req, res) {
     try {
       const employees = await Employee.find();
 
@@ -11,7 +11,7 @@ module.exports = {
       res.json({ message: this.errorMessage, error });
     }
   },
-  show: async function (req, res, next) {
+  show: async function (req, res) {
     try {
       const { employeeID } = req.body;
       const foundEmployee = await Employee.findById(employeeID);
@@ -21,42 +21,28 @@ module.exports = {
       res.json({ message: this.errorMessage, error });
     }
   },
-  store: async function (req, res, next) {
+  store: async function (req, res) {
     try {
-      const { name, designation, email, phone, age } = req.body;
-      const employee = new Employee({
-        name,
-        designation,
-        email,
-        phone,
-        age,
-      });
+      const employee = new Employee(req.body);
 
       if (req.files) {
         let path = "";
         req.files.forEach((file) => {
           path += file.path + ",";
         });
-        console.log(path);
-        console.log(
-          "path.lastIndexOf(",
-          ")",
-          path.substring(0, path.lastIndexOf(","))
-        );
         path = path.substring(0, path.lastIndexOf(","));
         employee.avatar = path;
       }
-      await employee.save();
+      employee.save();
 
-      return res.json({ message: "Employee added successfully!", employee });
+      return res.json({ message: "Employee added successfully!" });
     } catch (error) {
       res.json({ message: this.errorMessage, error });
     }
   },
-  update: async function (req, res, next) {
+  update: async function (req, res) {
     try {
-      const { employeeID } = req.body;
-      const { name, designation, email, phone, age } = req.body;
+      const { name, designation, email, phone, age, employeeID } = req.body;
       const updatedData = { name, designation, email, phone, age };
 
       const employee = await Employee.findByIdAndUpdate(
@@ -70,7 +56,7 @@ module.exports = {
       res.json({ message: this.errorMessage, error });
     }
   },
-  destory: async function (req, res, next) {
+  destory: async function (req, res) {
     try {
       const { employeeID } = req.body;
       await Employee.findByIdAndRemove(employeeID);
