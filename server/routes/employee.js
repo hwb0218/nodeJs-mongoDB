@@ -1,13 +1,14 @@
 const express = require("express");
+const auth = require("../middleware/auth");
 const upload = require("../middleware/multer");
-const EmployeeController = require("../controllers/EmployeeController");
+const Employee = require("../controllers/employee");
 
 const router = express.Router();
 
-router.get("/", EmployeeController.index);
-router.post("/show", EmployeeController.show);
-router.post("/store", upload.array("avatar"), EmployeeController.store);
-router.post("/update", EmployeeController.update);
-router.post("/destory", EmployeeController.destory);
+router.get("/", auth.verifyAccessToken, Employee.index);
+router.post("/show", Employee.show);
+router.post("/store", upload.array("avatar"), Employee.store);
+router.post("/update", Employee.update);
+router.post("/destory", Employee.destory);
 
 module.exports = router;
