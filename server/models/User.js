@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const saltRounds = 10;
 const { Schema, model } = mongoose;
@@ -41,13 +42,34 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-userSchema.methods.comparePassword = async function (password, callback) {
+userSchema.methods.comparePassword = async function (password) {
   try {
     const user = this;
-    const isMatched = await bcrypt.compare(password, user.password);
-    if (isMatched) callback(null, isMatched);
+    return bcrypt.compare(password, user.password);
   } catch (error) {
-    return callback(new Error("Invalid password"), error);
+    return new Error(error);
+  }
+};
+
+userSchema.methods.generateToken = async function () {
+  try {
+    const user = this;
+    const userPayload = { email: user.email, id: user._id };
+
+    const accessToken = jwt.sign(userPayload, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME,
+    });
+
+    const refreshToken = jwt.sign(
+      userPayload,
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME,
+      }
+    );
+    return { accessToken, refreshToken };
+  } catch (error) {
+    return new Error(error);
   }
 };
 
